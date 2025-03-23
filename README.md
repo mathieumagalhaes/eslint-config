@@ -20,7 +20,7 @@ yarn install -D @mathieumagalhaes/eslint-config @antfu/eslint-config
 npm install -D @mathieumagalhaes/eslint-config @antfu/eslint-config
 ```
 
-Add to your `esline.config.ts` or `esline.config.mjs`:
+Add to your `eslint.config.ts` or `eslint.config.mjs`:
 
 ```js
 import antfu from '@antfu/eslint-config'
