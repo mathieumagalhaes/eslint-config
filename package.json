@@ -1,32 +1,32 @@
 {
   "name": "@mathieumagalhaes/eslint-config",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Personal and opinionated eslint config",
-  "type": "module",
-  "private": false,
-  "license": "MIT",
-  "publishConfig": {
-    "access": "public"
-  },
   "author": "Mathieu Magalhaes <mathieu.magalhaes@gmail.com>",
   "repository": {
     "url": "https://github.com/mathieumagalhaes/eslint-config"
   },
+  "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
+  "license": "MIT",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "node_modules/.bin/tsc && node_modules/.bin/vite build --watch",
     "start": "node_modules/.bin/vite --host --open",
     "build": "node_modules/.bin/tsc && node_modules/.bin/vite build",
     "build:types": "dts-bundle-generator --config ./dts-bundle-generator.config.ts",
     "lint": "node_modules/.bin/eslint ./src --ext .ts",
+    "deploy": "pnpm build && npm publish",
     "clean": "rm -rf ./dist"
   },
-  "packageManager": "pnpm@10.6.5+sha512.cdf928fca20832cd59ec53826492b7dc25dc524d4370b6b4adbf65803d32efaa6c1c88147c0ae4e8d579a6c9eec715757b50d4fa35eea179d868eada4ed043af",
   "dependencies": {
     "dts-bundle-generator": "^9.5.1",
     "eslint": "^9.23.0",
@@ -34,14 +34,15 @@
     "vite": "^6.2.2",
     "vite-plugin-dts": "^4.5.3"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
-  },
   "devDependencies": {
     "@antfu/eslint-config": "^4.11.0",
     "@types/node": "^22.13.11",
     "jiti": "^2.4.2"
+  },
+  "packageManager": "pnpm@10.6.5+sha512.cdf928fca20832cd59ec53826492b7dc25dc524d4370b6b4adbf65803d32efaa6c1c88147c0ae4e8d579a6c9eec715757b50d4fa35eea179d868eada4ed043af",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

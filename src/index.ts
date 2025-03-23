@@ -20,7 +20,7 @@ const VueOptions = {
   'vue/block-order': ['error', { order: ['template', 'script', 'style'] }],
   'vue/html-self-closing': ['error', {
     html: {
-      void: 'always',
+      void: 'never',
       normal: 'never',
       component: 'always',
     },
