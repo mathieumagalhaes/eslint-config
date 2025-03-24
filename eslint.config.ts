@@ -20,6 +20,7 @@ export default antfu({
     'pnpm-lock.yaml',
     'tsconfig*.json',
     'vite.config.ts',
+    './*.md',
   ],
 
   rules: {

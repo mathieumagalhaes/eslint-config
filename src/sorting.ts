@@ -1,10 +1,12 @@
 import { readdirSync, statSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-interface Folder {
+type Folder = {
   path: string
   folderName: string
 }
+
+type ImportGroup = string[] | { newlinesBetween: string }
 
 const ignoreFolders = [
   '.git',
@@ -37,13 +39,26 @@ const parseSourceFolder = (srcFolder: string) => {
       return acc
     }, [])
 
-  const CUSTOM_GROUPS: Record<string, string[]> = {}
+  const CUSTOM_GROUPS: Record<string, string[]> = {
+    '@/react': ['^react$', '^react-.*', '^@react/.*', '.*-react-.*'],
+    '@/vue': ['^vue$', '^vue-.*', '^@vue/.*', '.*-vue-.*'],
+    '@/vueuse': ['^vueuse$', '^vueuse-.*', '^@vueuse/.*', '.*-vueuse-.*'],
+    '@/nuxt': ['^nuxt$', '^nuxt-.*', '^@nuxt/.*', '.*-nuxt-.*'],
+  }
+
   folders.forEach(({ folderName }) => {
+    if (CUSTOM_GROUPS[`@/${folderName}`]) {
+      return
+    }
     CUSTOM_GROUPS[`@/${folderName}`] = [
       `^@/${folderName}$`,
       `@/${folderName}/+`,
+      `^@@/${folderName}$`,
+      `@@/${folderName}/+`,
       `~/${folderName}$`,
       `~/${folderName}/+`,
+      `~~/${folderName}$`,
+      `~~/${folderName}/+`,
     ]
   })
 
@@ -69,58 +84,109 @@ export const sortImportsConfig = (srcFolder: string) => {
     '@/functions',
     '@/utils',
     '@/hooks',
+    '@/templates',
     '@/layouts',
     '@/pages',
     '@/components',
+    //
+    '@/vue',
+    '@/vueuse',
+    '@/nuxt',
+    '@/react',
   ]
 
   const unsortedAliasses = Object.keys(CUSTOM_GROUPS).filter(alias => !alreadySorted.includes(alias))
+
+  const unparsedGroups = [
+    ['side-effect-style', 'side-effect'],
+    { newlinesBetween: 'always' },
+    // --- New line here ---
+    [
+      'builtin-type',
+      'external-type',
+      'type',
+    ],
+    [
+      existsOrUndefined('@/types'),
+      'internal-type',
+    ].filter(Boolean),
+    [
+      'parent-type',
+      'sibling-type',
+      'index-type',
+    ],
+    { newlinesBetween: 'always' },
+    // --- New line here ---
+    ['@/vue'],
+    ['@/vueuse'],
+    ['@/nuxt'],
+    ['@/react'],
+    [
+      'builtin',
+      'external',
+      'unknown',
+    ],
+    { newlinesBetween: 'always' },
+    // --- New line here ---
+    ['parent', 'sibling', 'index'],
+    { newlinesBetween: 'always' },
+    // --- New line here ---
+    [existsOrUndefined('@/modules')].filter(Boolean),
+    [existsOrUndefined('@/plugins')].filter(Boolean),
+    [existsOrUndefined('@/providers')].filter(Boolean),
+    [existsOrUndefined('@/public')].filter(Boolean),
+    [existsOrUndefined('@/server')].filter(Boolean),
+    { newlinesBetween: 'always' },
+    // --- New line here ---
+    ['internal', ...unsortedAliasses],
+    { newlinesBetween: 'always' },
+    // --- New line here ---
+    [existsOrUndefined('@/constants')].filter(Boolean),
+    [existsOrUndefined('@/functions')].filter(Boolean),
+    [existsOrUndefined('@/hooks')].filter(Boolean),
+    [existsOrUndefined('@/utils')].filter(Boolean),
+    { newlinesBetween: 'always' },
+    // --- New line here ---
+    [existsOrUndefined('@/layouts')].filter(Boolean),
+    [existsOrUndefined('@/pages')].filter(Boolean),
+    { newlinesBetween: 'always' },
+    // --- New line here ---
+    [existsOrUndefined('@/components')].filter(Boolean),
+    [existsOrUndefined('@/templates')].filter(Boolean),
+    { newlinesBetween: 'always' },
+    // --- New line here ---
+    ['object'],
+  ] as ImportGroup[]
+
+  const groups = unparsedGroups.reduce((acc, next, index) => {
+    let result = index === 0
+    if (index > 0) {
+      const last = acc[acc.length - 1]
+      if (Array.isArray(next))
+        result = next.length > 0
+      else if (Array.isArray(last))
+        result = true
+    }
+    if (result) {
+      acc.push(next)
+    }
+    return acc
+  }, [] as ImportGroup[])
 
   return {
     customGroups: {
       type: { ...CUSTOM_GROUPS },
       value: { ...CUSTOM_GROUPS },
     },
-    groups: [
-      [
-        'type',
-        'internal-type',
-        'parent-type',
-        'sibling-type',
-        'index-type',
-        existsOrUndefined('@/types'),
-      ].filter(Boolean),
-      [
-        'internal',
-        'external',
-        'builtin',
-        'parent',
-        'index',
-        'object',
-        'unknown',
-      ].filter(Boolean),
-      'sibling',
-      [
-        existsOrUndefined('@/server'),
-        existsOrUndefined('@/providers'),
-        existsOrUndefined('@/modules'),
-        existsOrUndefined('@/plugins'),
-        existsOrUndefined('@/public'),
-      ].filter(Boolean),
-      unsortedAliasses,
-      [
-        existsOrUndefined('@/constants'),
-        existsOrUndefined('@/functions'),
-        existsOrUndefined('@/utils'),
-        existsOrUndefined('@/hooks'),
-      ].filter(Boolean),
-      [
-        existsOrUndefined('@/layouts'),
-        existsOrUndefined('@/pages'),
-      ].filter(Boolean),
-      [
-        existsOrUndefined('@/components'),
-      ].filter(Boolean),
-    ].filter(el => (el?.length || 0) > 0),
+    sortSideEffects: false,
+    specialCharacters: 'keep',
+    internalPattern: [
+      '^@/.*',
+      '^@@/.*',
+      '^~/.*',
+      '^~~/.*',
+    ],
+    newlinesBetween: 'never',
+    groups,
   }
 }
