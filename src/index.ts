@@ -40,6 +40,7 @@ export default (options: Options = {}) => {
     'antfu/if-newline': 'off',
     'antfu/top-level-function': 'off',
     'brace-style': ['error', '1tbs'],
+    'import/no-named-default': 'off',
     'no-useless-return': 'off',
     'node/prefer-global/process': 'off',
     'perfectionist/sort-imports': [
