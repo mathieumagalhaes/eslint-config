@@ -3,30 +3,39 @@ import { resolve } from 'node:path'
 
 interface Folder {
   path: string
-  prefix: string
   folderName: string
-  extensions: string[]
 }
+
+const ignoreFolders = [
+  '.git',
+  '.nuxt',
+  '.next',
+  '.astro',
+  '.vscode',
+  '.idea',
+  '.lab',
+  '.cache',
+  '.db',
+  '.mails',
+  '.output',
+  'output',
+  'dist',
+  'node_modules',
+]
 
 const parseSourceFolder = (srcFolder: string) => {
   const folders = readdirSync(srcFolder)
-    .filter(el => !['.git', '.nuxt', 'dist', 'output', '.output', 'node_modules'].includes(el))
+    .filter(el => !ignoreFolders.includes(el))
     .reduce<Folder[]>((acc, pathToInput) => {
       const path = resolve(srcFolder, pathToInput)
       if (statSync(path).isDirectory()) {
         acc.push({
           path,
-          prefix: pathToInput[0].toUpperCase() + pathToInput.substring(1),
           folderName: pathToInput.split('/').slice(-1)[0],
-          extensions: ['vue'],
         })
       }
       return acc
     }, [])
-
-  const folderExists = (...folderNames: string[]) => {
-    return folders.some(el => folderNames.includes(el.path.split('/').slice(-1)[0]))
-  }
 
   const CUSTOM_GROUPS: Record<string, string[]> = {}
   folders.forEach(({ folderName }) => {
@@ -38,11 +47,15 @@ const parseSourceFolder = (srcFolder: string) => {
     ]
   })
 
-  return { CUSTOM_GROUPS, folderExists }
+  return { CUSTOM_GROUPS }
 }
 
 export const sortImportsConfig = (srcFolder: string) => {
-  const { CUSTOM_GROUPS, folderExists } = parseSourceFolder(srcFolder)
+  const { CUSTOM_GROUPS } = parseSourceFolder(srcFolder)
+
+  const existsOrUndefined = (folderAlias: string) => {
+    return CUSTOM_GROUPS[folderAlias] ? folderAlias : undefined
+  }
 
   const alreadySorted = [
     '@/types',
@@ -61,11 +74,7 @@ export const sortImportsConfig = (srcFolder: string) => {
     '@/components',
   ]
 
-  const unsortedAliasses = Object.keys(CUSTOM_GROUPS).reduce<string[]>((acc, key) => {
-    if (alreadySorted.includes(key)) return acc
-    acc.push(key)
-    return acc
-  }, [])
+  const unsortedAliasses = Object.keys(CUSTOM_GROUPS).filter(alias => !alreadySorted.includes(alias))
 
   return {
     customGroups: {
@@ -79,7 +88,7 @@ export const sortImportsConfig = (srcFolder: string) => {
         'parent-type',
         'sibling-type',
         'index-type',
-        folderExists('types') && '@/types',
+        existsOrUndefined('@/types'),
       ].filter(Boolean),
       [
         'internal',
@@ -92,25 +101,25 @@ export const sortImportsConfig = (srcFolder: string) => {
       ].filter(Boolean),
       'sibling',
       [
-        folderExists('server') && '@/server',
-        folderExists('providers') && '@/providers',
-        folderExists('modules') && '@/modules',
-        folderExists('plugins') && '@/plugins',
-        folderExists('public') && '@/public',
+        existsOrUndefined('@/server'),
+        existsOrUndefined('@/providers'),
+        existsOrUndefined('@/modules'),
+        existsOrUndefined('@/plugins'),
+        existsOrUndefined('@/public'),
       ].filter(Boolean),
       unsortedAliasses,
       [
-        folderExists('constants') && '@/constants',
-        folderExists('functions') && '@/functions',
-        folderExists('utils') && '@/utils',
-        folderExists('hooks') && '@/hooks',
+        existsOrUndefined('@/constants'),
+        existsOrUndefined('@/functions'),
+        existsOrUndefined('@/utils'),
+        existsOrUndefined('@/hooks'),
       ].filter(Boolean),
       [
-        folderExists('layouts') && '@/layouts',
-        folderExists('pages') && '@/pages',
+        existsOrUndefined('@/layouts'),
+        existsOrUndefined('@/pages'),
       ].filter(Boolean),
       [
-        folderExists('components') && '@/components',
+        existsOrUndefined('@/components'),
       ].filter(Boolean),
     ].filter(el => (el?.length || 0) > 0),
   }
