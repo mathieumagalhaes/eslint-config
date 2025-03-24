@@ -79,6 +79,7 @@ export const sortImportsConfig = (srcFolder: string) => {
     '@/modules',
     '@/plugins',
     '@/public',
+    '@/store',
     '@/stores',
     '@/constants',
     '@/functions',
@@ -101,34 +102,36 @@ export const sortImportsConfig = (srcFolder: string) => {
     ['side-effect-style', 'side-effect'],
     { newlinesBetween: 'always' },
     // --- New line here ---
-    [
-      'builtin-type',
-      'external-type',
-      'type',
-    ],
-    [
-      existsOrUndefined('@/types'),
-      'internal-type',
-    ].filter(Boolean),
-    [
-      'parent-type',
-      'sibling-type',
-      'index-type',
-    ],
-    { newlinesBetween: 'always' },
-    // --- New line here ---
     ['@/vue'],
     ['@/vueuse'],
     ['@/nuxt'],
     ['@/react'],
     [
+      'builtin-type',
+      'external-type',
+      'type',
       'builtin',
       'external',
       'unknown',
     ],
     { newlinesBetween: 'always' },
     // --- New line here ---
-    ['parent', 'sibling', 'index'],
+    [
+      'parent-type',
+      'sibling-type',
+      'index-type',
+      'parent',
+      'sibling',
+      'index',
+    ],
+    { newlinesBetween: 'always' },
+    // --- New line here ---
+    [existsOrUndefined('@/types')].filter(Boolean),
+    [
+      'internal-type',
+      'internal',
+      ...unsortedAliasses,
+    ].filter(Boolean),
     { newlinesBetween: 'always' },
     // --- New line here ---
     [existsOrUndefined('@/modules')].filter(Boolean),
@@ -136,15 +139,7 @@ export const sortImportsConfig = (srcFolder: string) => {
     [existsOrUndefined('@/providers')].filter(Boolean),
     [existsOrUndefined('@/public')].filter(Boolean),
     [existsOrUndefined('@/server')].filter(Boolean),
-    { newlinesBetween: 'always' },
-    // --- New line here ---
-    ['internal', ...unsortedAliasses],
-    { newlinesBetween: 'always' },
-    // --- New line here ---
-    [existsOrUndefined('@/constants')].filter(Boolean),
-    [existsOrUndefined('@/functions')].filter(Boolean),
-    [existsOrUndefined('@/hooks')].filter(Boolean),
-    [existsOrUndefined('@/utils')].filter(Boolean),
+    [existsOrUndefined('@/store'), existsOrUndefined('@/stores')].filter(Boolean),
     { newlinesBetween: 'always' },
     // --- New line here ---
     [existsOrUndefined('@/layouts')].filter(Boolean),
@@ -153,6 +148,12 @@ export const sortImportsConfig = (srcFolder: string) => {
     // --- New line here ---
     [existsOrUndefined('@/components')].filter(Boolean),
     [existsOrUndefined('@/templates')].filter(Boolean),
+    { newlinesBetween: 'always' },
+    // --- New line here ---
+    [existsOrUndefined('@/constants')].filter(Boolean),
+    [existsOrUndefined('@/functions')].filter(Boolean),
+    [existsOrUndefined('@/hooks')].filter(Boolean),
+    [existsOrUndefined('@/utils')].filter(Boolean),
     { newlinesBetween: 'always' },
     // --- New line here ---
     ['object'],
