@@ -1,5 +1,4 @@
 import type { Linter } from 'eslint'
-
 import { resolve } from 'node:path'
 
 import { sortImportsConfig } from './sorting'
