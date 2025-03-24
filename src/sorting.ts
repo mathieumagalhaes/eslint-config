@@ -75,15 +75,19 @@ export const sortImportsConfig = (srcFolder: string) => {
   const alreadySorted = [
     '@/types',
     '@/server',
+    '@/middleware',
     '@/providers',
     '@/modules',
     '@/plugins',
+    '@/app',
+    '@/assets',
     '@/public',
     '@/store',
     '@/stores',
     '@/constants',
     '@/functions',
     '@/utils',
+    '@/lib',
     '@/hooks',
     '@/templates',
     '@/layouts',
@@ -126,34 +130,43 @@ export const sortImportsConfig = (srcFolder: string) => {
     ],
     { newlinesBetween: 'always' },
     // --- New line here ---
-    [existsOrUndefined('@/types')].filter(Boolean),
     [
       'internal-type',
       'internal',
       ...unsortedAliasses,
+      existsOrUndefined('@/app'),
+      existsOrUndefined('@/assets'),
+      existsOrUndefined('@/public'),
+      existsOrUndefined('@/middleware'),
+      existsOrUndefined('@/modules'),
+      existsOrUndefined('@/plugins'),
+      existsOrUndefined('@/providers'),
+      existsOrUndefined('@/server'),
+      existsOrUndefined('@/store'),
+      existsOrUndefined('@/stores'),
+      existsOrUndefined('@/types'),
     ].filter(Boolean),
     { newlinesBetween: 'always' },
     // --- New line here ---
-    [existsOrUndefined('@/modules')].filter(Boolean),
-    [existsOrUndefined('@/plugins')].filter(Boolean),
-    [existsOrUndefined('@/providers')].filter(Boolean),
-    [existsOrUndefined('@/public')].filter(Boolean),
-    [existsOrUndefined('@/server')].filter(Boolean),
-    [existsOrUndefined('@/store'), existsOrUndefined('@/stores')].filter(Boolean),
+    [
+      existsOrUndefined('@/layouts'),
+      existsOrUndefined('@/pages'),
+    ].filter(Boolean),
     { newlinesBetween: 'always' },
     // --- New line here ---
-    [existsOrUndefined('@/layouts')].filter(Boolean),
-    [existsOrUndefined('@/pages')].filter(Boolean),
+    [
+      existsOrUndefined('@/components'),
+      existsOrUndefined('@/templates'),
+    ].filter(Boolean),
     { newlinesBetween: 'always' },
     // --- New line here ---
-    [existsOrUndefined('@/components')].filter(Boolean),
-    [existsOrUndefined('@/templates')].filter(Boolean),
-    { newlinesBetween: 'always' },
-    // --- New line here ---
-    [existsOrUndefined('@/constants')].filter(Boolean),
-    [existsOrUndefined('@/functions')].filter(Boolean),
-    [existsOrUndefined('@/hooks')].filter(Boolean),
-    [existsOrUndefined('@/utils')].filter(Boolean),
+    [
+      existsOrUndefined('@/constants'),
+      existsOrUndefined('@/functions'),
+      existsOrUndefined('@/hooks'),
+      existsOrUndefined('@/lib'),
+      existsOrUndefined('@/utils'),
+    ].filter(Boolean),
     { newlinesBetween: 'always' },
     // --- New line here ---
     ['object'],
@@ -174,7 +187,7 @@ export const sortImportsConfig = (srcFolder: string) => {
     return acc
   }, [] as ImportGroup[])
 
-  return {
+  const config = {
     customGroups: {
       type: { ...CUSTOM_GROUPS },
       value: { ...CUSTOM_GROUPS },
@@ -190,4 +203,6 @@ export const sortImportsConfig = (srcFolder: string) => {
     newlinesBetween: 'never',
     groups,
   }
+
+  return config
 }
