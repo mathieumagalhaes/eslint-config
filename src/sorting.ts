@@ -41,7 +41,7 @@ const parseSourceFolder = (srcFolder: string) => {
 
   const CUSTOM_GROUPS: Record<string, string[]> = {
     '@/react': ['^react$', '^react-.*', '^@react/.*'],
-    '@/vue': ['^vue$', '^vue-.*', '^@vue/.*'],
+    '@/vue': ['^vue$', '^vue-.*', '^@vue/.*', 'vuex'],
     '@/vueuse': ['^vueuse$', '^vueuse-.*', '^@vueuse/.*'],
     '@/nuxt': ['^nuxt$', '^nuxt-.*', '^@nuxt/.*'],
   }
