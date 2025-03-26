@@ -1,6 +1,6 @@
 {
   "name": "@mathieumagalhaes/eslint-config",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Personal and opinionated eslint config",
   "author": "Mathieu Magalhaes <mathieu.magalhaes@gmail.com>",
   "repository": {
