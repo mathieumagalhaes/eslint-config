@@ -28,17 +28,17 @@
     "clean": "rm -rf ./dist"
   },
   "dependencies": {
-    "@mathieumagalhaes/eslint-plugin-search-and-replace": "^0.0.2",
-    "dts-bundle-generator": "^9.5.1",
-    "eslint": "^9.23.0",
-    "typescript": "^5.8.2",
-    "vite": "^6.2.2",
-    "vite-plugin-dts": "^4.5.3"
+    "@mathieumagalhaes/eslint-plugin-search-and-replace": "^0.0.2"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.11.0",
     "@types/node": "^22.13.11",
-    "jiti": "^2.4.2"
+    "dts-bundle-generator": "^9.5.1",
+    "eslint": "^9.23.0",
+    "jiti": "^2.4.2",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.2",
+    "vite-plugin-dts": "^4.5.3"
   },
   "peerDependencies": {
     "@antfu/eslint-config": "^4.11.0"

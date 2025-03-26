@@ -1,14 +1,30 @@
 import type { OptionsConfig, TypedFlatConfigItem } from '@antfu/eslint-config'
-import antfu from '@antfu/eslint-config'
 import searchAndReplace from '@mathieumagalhaes/eslint-plugin-search-and-replace'
 import type { Linter } from 'eslint'
 import { resolve } from 'node:path'
 
 import { sortImportsConfig } from './sorting'
 
+const DEFAULT_IGNORES = [
+  'node_modules/**',
+  'dist/**',
+  'build/**',
+  'public/meta/*.json',
+  'package.json',
+  'package-lock.json',
+]
+
+const DEFAULT_STYLISITC = {
+  indent: 2,
+  quotes: 'single' as const,
+  semi: false,
+  jsx: false,
+}
+
 type MyOptions = {
   srcFolder?: string
-  PreferAtPrefixImportsRules?: boolean
+  preferAtPrefixImportsRules?: boolean
+  addDefaultIgnores?: boolean
 }
 
 type AntfuOptions = OptionsConfig & Omit<TypedFlatConfigItem, 'files'>
@@ -37,7 +53,7 @@ const VueRules = {
   }],
 }
 
-const PreferAtPrefixImportsRules = {
+const preferAtPrefixImportsRules = {
   'search-and-replace/replace': ['error', {
     search: '~/',
     replace: '@/',
@@ -82,8 +98,8 @@ const customRules = (options: ExtendedOptions = {}) => {
     customRules = { ...customRules, ...VueRules }
   }
 
-  if (options?.PreferAtPrefixImportsRules) {
-    customRules = { ...customRules, ...PreferAtPrefixImportsRules }
+  if (options?.preferAtPrefixImportsRules) {
+    customRules = { ...customRules, ...preferAtPrefixImportsRules }
   }
 
   return customRules as unknown as Partial<Linter.RulesRecord>
@@ -92,14 +108,14 @@ const customRules = (options: ExtendedOptions = {}) => {
 const customPlugins = (options: ExtendedOptions = {}) => {
   const plugins = {} as ExtendedOptions['plugins']
 
-  if (plugins && options?.PreferAtPrefixImportsRules) {
+  if (plugins && options?.preferAtPrefixImportsRules) {
     plugins['search-and-replace'] = searchAndReplace
   }
 
   return plugins
 }
 
-export default function (optionsDTO: ExtendedOptions): ReturnType<typeof antfu> {
+export default function (optionsDTO: ExtendedOptions): OptionsConfig & Omit<TypedFlatConfigItem, 'files'> {
   const options = { ...optionsDTO }
 
   options.plugins = {
@@ -112,5 +128,15 @@ export default function (optionsDTO: ExtendedOptions): ReturnType<typeof antfu> 
     ...(options.rules || {}),
   }
 
-  return antfu(options)
+  options.ignores = [
+    ...DEFAULT_IGNORES,
+    ...(options.ignores || []),
+  ]
+
+  options.stylistic = {
+    ...DEFAULT_STYLISITC,
+    ...(options.stylistic && typeof options.stylistic === 'object' ? options.stylistic : {}),
+  }
+
+  return options
 }

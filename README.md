@@ -27,42 +27,14 @@ import antfu from '@antfu/eslint-config'
 import mathieumagalhaes from '@mathieumagalhaes/eslint-config'
 import { resolve } from 'node:path'
 
-export default antfu({
+export default antfu(mathieumagalhaes({
   type: 'app',
   vue: true,
   typescript: true,
 
-  stylistic: {
-    indent: 2,
-    quotes: 'single',
-    semi: false,
-  },
-
-  ignores: [
-    'node_modules/**',
-    'dist/**',
-    'build/**',
-    'public/meta/*.json',
-    'package.json',
-    'package-lock.json',
-    'pnpm-lock.yaml',
-    'yarn.lock',
-    'bun.lockb',
-    'tsconfig*.json',
-    '.gitlab-ci.yml',
-    '.gitlab-ci.yaml',
-    'vite.config.ts',
-    'nuxt.config.ts',
-  ],
-
-  rules: {
-    ...mathieumagalhaes({
-      vue: true,
-      typescript: true,
-      srcFolder: resolve(import.meta.dirname, './src')
-    }),
-  },
-})
+  srcFolder: resolve(import.meta.dirname, './src'), // default: ./src
+  preferAtPrefixImportsRules: true, // default: false
+}))
 ```
 ___
 
