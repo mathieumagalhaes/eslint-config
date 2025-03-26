@@ -1,8 +1,8 @@
-import antfu from '@antfu/eslint-config'
+import { resolve } from 'node:path'
 
-import customRules from './src'
+import mathieumagalhaes from './src'
 
-export default antfu({
+export default mathieumagalhaes({
   type: 'app',
   vue: true,
   typescript: true,
@@ -23,7 +23,6 @@ export default antfu({
     './*.md',
   ],
 
-  rules: {
-    ...customRules({ vue: true, typescript: true }),
-  },
+  srcFolder: resolve(import.meta.dirname, './src'),
+  PreferAtPrefixImportsRules: true,
 })

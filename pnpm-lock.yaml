@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@mathieumagalhaes/eslint-plugin-search-and-replace':
+        specifier: ^0.0.2
+        version: 0.0.2(eslint@9.23.0(jiti@2.4.2))
       dts-bundle-generator:
         specifier: ^9.5.1
         version: 9.5.1
@@ -365,6 +368,12 @@ packages:
 
   '@jridgewell/sourcemap-codec@1.5.0':
     resolution: {integrity: sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==}
+
+  '@mathieumagalhaes/eslint-plugin-search-and-replace@0.0.2':
+    resolution: {integrity: sha512-ltFygIlnlpWbnuNGZTA6RSXaXvQE6umUxdxcgmCirv2pgigX5PHMJGLpFoyQXDSe6jFzzJmbw5uL8WkptIT9pA==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      eslint: '>=9.0.0'
 
   '@microsoft/api-extractor-model@7.30.4':
     resolution: {integrity: sha512-RobC0gyVYsd2Fao9MTKOfTdBm41P/bCMUmzS5mQ7/MoAKEqy0FOBph3JOYdq4X4BsEnMEiSHc+0NUNmdzxCpjA==}
@@ -2276,6 +2285,10 @@ snapshots:
   '@humanwhocodes/retry@0.4.2': {}
 
   '@jridgewell/sourcemap-codec@1.5.0': {}
+
+  '@mathieumagalhaes/eslint-plugin-search-and-replace@0.0.2(eslint@9.23.0(jiti@2.4.2))':
+    dependencies:
+      eslint: 9.23.0(jiti@2.4.2)
 
   '@microsoft/api-extractor-model@7.30.4(@types/node@22.13.11)':
     dependencies:
