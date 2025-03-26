@@ -19,13 +19,14 @@ export default defineConfig({
       name: 'lib',
       formats: ['es', 'cjs'],                       // For libraries
       // formats: ['es', 'cjs', 'umd', 'iife'],     // For browser use
-      fileName: format => `index.${format === 'cjs' ? 'cjs' : `${format}.js`}`,
+      fileName: (format, entryName) => {
+        const fileName = entryName.split('/').pop()
+        return `${fileName}.${format === 'cjs' ? 'cjs' : `${format}.js`}`
+      }
     },
-    minify: false,
     rollupOptions: {
       external: [
         '@antfu/eslint-config',
-        '@mathieumagalhaes/eslint-plugin-search-and-replace',
         'eslint',
         /^node:(.+)$/,
         'path',
@@ -48,18 +49,14 @@ export default defineConfig({
         'vm'
       ],
       output: {
-        minifyInternalExports: true,
         globals: {
           '@antfu/eslint-config': 'antfu',
-          '@mathieumagalhaes/eslint-plugin-search-and-replace': 'searchAndReplace',
           'eslint': 'eslint',
           'fs': 'fs',
           'path': 'path',
           'node:fs': 'fs',
           'node:path': 'path',
         },
-        preserveModules: true,
-        preserveModulesRoot: 'src'
       }
     },
   },
