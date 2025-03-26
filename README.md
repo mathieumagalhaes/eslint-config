@@ -23,9 +23,9 @@ npm install -D @mathieumagalhaes/eslint-config @antfu/eslint-config
 Add to your `eslint.config.ts` or `eslint.config.mjs`:
 
 ```js
+import { resolve } from 'node:path'
 import antfu from '@antfu/eslint-config'
 import mathieumagalhaes from '@mathieumagalhaes/eslint-config'
-import { resolve } from 'node:path'
 
 export default antfu(mathieumagalhaes({
   type: 'app',
