@@ -27,7 +27,7 @@ const ignoreFolders = [
   'node_modules',
 ]
 
-const parseSourceFolder = (srcFolder: string) => {
+const parseSourceFolder = (srcFolder: string, options: ExtendedOptions = {}) => {
   const folders = readdirSync(srcFolder)
     .filter(el => !ignoreFolders.includes(el))
     .reduce<Folder[]>((acc, pathToInput) => {
@@ -64,26 +64,25 @@ const parseSourceFolder = (srcFolder: string) => {
     ]
   })
 
-  return { CUSTOM_GROUPS }
-}
+  const aliasesAppRelated = options?.aliasesAppRelated || []
+  const aliasesLayoutRelated = options?.aliasesAppRelated || []
+  const aliasesComponentsRelated = options?.aliasesAppRelated || []
+  const aliasesConstantsRelated = options?.aliasesAppRelated || []
+  const aliasesFunctionsRelated = options?.aliasesAppRelated || []
+  const aliasesTypesRelated = options?.aliasesAppRelated || []
 
-export const sortImportsConfig = (srcFolder: string, options: ExtendedOptions = {}) => {
-  const { CUSTOM_GROUPS } = parseSourceFolder(srcFolder)
-
-  const {
-    aliasesAppRelated,
-    aliasesLayoutRelated,
-    aliasesComponentsRelated,
-    aliasesConstantsRelated,
-    aliasesFunctionsRelated,
-    aliasesTypesRelated,
-  } = options
-
-  const existsOrUndefined = (folderAlias: string) => {
-    return CUSTOM_GROUPS[folderAlias] ? folderAlias : undefined
+  const aliasMap = (el: string) => {
+    if (!CUSTOM_GROUPS[el]) CUSTOM_GROUPS[el] = [`^${el}$`, `^${el}/+`]
   }
 
-  const alreadySorted = [
+  if (aliasesAppRelated.length) aliasesAppRelated.forEach(aliasMap)
+  if (aliasesLayoutRelated.length) aliasesLayoutRelated.forEach(aliasMap)
+  if (aliasesComponentsRelated.length) aliasesComponentsRelated.forEach(aliasMap)
+  if (aliasesConstantsRelated.length) aliasesConstantsRelated.forEach(aliasMap)
+  if (aliasesFunctionsRelated.length) aliasesFunctionsRelated.forEach(aliasMap)
+  if (aliasesTypesRelated.length) aliasesTypesRelated.forEach(aliasMap)
+
+  const DEFAULT_ALREADY_SORTED = [
     '@/types',
     '@/server',
     '@/middleware',
@@ -112,15 +111,58 @@ export const sortImportsConfig = (srcFolder: string, options: ExtendedOptions = 
     '@/vueuse',
     '@/nuxt',
     '@/react',
-    ...(aliasesAppRelated || []),
-    ...(aliasesLayoutRelated || []),
-    ...(aliasesComponentsRelated || []),
-    ...(aliasesConstantsRelated || []),
-    ...(aliasesFunctionsRelated || []),
-    ...(aliasesTypesRelated || []),
   ]
 
-  const unsortedAliasses = Object.keys(CUSTOM_GROUPS).filter(alias => !alreadySorted.includes(alias))
+  const canSafelyAddInternalAlias = (folderAlias: string) => {
+    if (!CUSTOM_GROUPS[folderAlias]) return undefined
+    return folderAlias
+  }
+
+  const canSafelyAddPassedAlias = (folderAlias: string) => {
+    if (DEFAULT_ALREADY_SORTED.includes(folderAlias)) return undefined
+    if (!CUSTOM_GROUPS[folderAlias]) return undefined
+    return folderAlias
+  }
+
+  const alreadySortedSet = new Set([
+    ...DEFAULT_ALREADY_SORTED,
+    ...aliasesAppRelated,
+    ...aliasesLayoutRelated,
+    ...aliasesComponentsRelated,
+    ...aliasesConstantsRelated,
+    ...aliasesFunctionsRelated,
+    ...aliasesTypesRelated,
+  ])
+
+  const unsortedAliasses = Object.keys(CUSTOM_GROUPS).filter(alias => !alreadySortedSet.has(alias))
+
+  return {
+    CUSTOM_GROUPS,
+    unsortedAliasses,
+    aliasesAppRelated,
+    aliasesLayoutRelated,
+    aliasesComponentsRelated,
+    aliasesConstantsRelated,
+    aliasesFunctionsRelated,
+    aliasesTypesRelated,
+    canSafelyAddInternalAlias,
+    canSafelyAddPassedAlias,
+  }
+}
+
+export const sortImportsConfig = (srcFolder: string, options: ExtendedOptions = {}) => {
+  const {
+    CUSTOM_GROUPS,
+    unsortedAliasses,
+    aliasesAppRelated,
+    aliasesLayoutRelated,
+    aliasesComponentsRelated,
+    aliasesConstantsRelated,
+    aliasesFunctionsRelated,
+    aliasesTypesRelated,
+    canSafelyAddInternalAlias,
+    canSafelyAddPassedAlias,
+  } = parseSourceFolder(srcFolder, options)
 
   const unparsedGroups = [
     ['side-effect-style', 'side-effect'],
@@ -154,51 +196,51 @@ export const sortImportsConfig = (srcFolder: string, options: ExtendedOptions = 
     // --- New line here ---
     [
       'internal-type',
-      existsOrUndefined('@/types'),
-      ...(aliasesTypesRelated || []).map(existsOrUndefined),
+      canSafelyAddInternalAlias('@/types'),
+      ...(aliasesTypesRelated || []).map(canSafelyAddPassedAlias),
     ].filter(Boolean),
     ['internal'],
     [
       ...unsortedAliasses,
-      existsOrUndefined('@/app'),
-      existsOrUndefined('@/assets'),
-      existsOrUndefined('@/index'),
-      existsOrUndefined('@/public'),
-      existsOrUndefined('@/main'),
-      existsOrUndefined('@/middleware'),
-      existsOrUndefined('@/modules'),
-      existsOrUndefined('@/plugins'),
-      existsOrUndefined('@/providers'),
-      existsOrUndefined('@/server'),
-      existsOrUndefined('@/store'),
-      existsOrUndefined('@/stores'),
-      ...(aliasesAppRelated || []).map(existsOrUndefined),
+      canSafelyAddInternalAlias('@/app'),
+      canSafelyAddInternalAlias('@/assets'),
+      canSafelyAddInternalAlias('@/index'),
+      canSafelyAddInternalAlias('@/public'),
+      canSafelyAddInternalAlias('@/main'),
+      canSafelyAddInternalAlias('@/middleware'),
+      canSafelyAddInternalAlias('@/modules'),
+      canSafelyAddInternalAlias('@/plugins'),
+      canSafelyAddInternalAlias('@/providers'),
+      canSafelyAddInternalAlias('@/server'),
+      canSafelyAddInternalAlias('@/store'),
+      canSafelyAddInternalAlias('@/stores'),
+      ...(aliasesAppRelated || []).map(canSafelyAddPassedAlias),
     ].filter(Boolean),
     { newlinesBetween: 'always' },
     // --- New line here ---
     [
-      existsOrUndefined('@/layouts'),
-      existsOrUndefined('@/pages'),
-      ...(aliasesLayoutRelated || []).map(existsOrUndefined),
+      canSafelyAddInternalAlias('@/layouts'),
+      canSafelyAddInternalAlias('@/pages'),
+      ...(aliasesLayoutRelated || []).map(canSafelyAddPassedAlias),
     ].filter(Boolean),
     { newlinesBetween: 'always' },
     // --- New line here ---
     [
-      existsOrUndefined('@/components'),
-      existsOrUndefined('@/templates'),
-      ...(aliasesComponentsRelated || []).map(existsOrUndefined),
+      canSafelyAddInternalAlias('@/components'),
+      canSafelyAddInternalAlias('@/templates'),
+      ...(aliasesComponentsRelated || []).map(canSafelyAddPassedAlias),
     ].filter(Boolean),
     { newlinesBetween: 'always' },
     // --- New line here ---
     [
-      existsOrUndefined('@/constants'),
-      existsOrUndefined('@/enums'),
-      existsOrUndefined('@/functions'),
-      existsOrUndefined('@/hooks'),
-      existsOrUndefined('@/lib'),
-      existsOrUndefined('@/utils'),
-      ...(aliasesConstantsRelated || []).map(existsOrUndefined),
-      ...(aliasesFunctionsRelated || []).map(existsOrUndefined),
+      canSafelyAddInternalAlias('@/constants'),
+      canSafelyAddInternalAlias('@/enums'),
+      canSafelyAddInternalAlias('@/functions'),
+      canSafelyAddInternalAlias('@/hooks'),
+      canSafelyAddInternalAlias('@/lib'),
+      canSafelyAddInternalAlias('@/utils'),
+      ...(aliasesConstantsRelated || []).map(canSafelyAddPassedAlias),
+      ...(aliasesFunctionsRelated || []).map(canSafelyAddPassedAlias),
     ].filter(Boolean),
     { newlinesBetween: 'always' },
     // --- New line here ---
