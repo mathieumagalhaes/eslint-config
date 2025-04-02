@@ -1,8 +1,9 @@
 import { resolve } from 'node:path'
+import antfu from '@antfu/eslint-config'
 
 import mathieumagalhaes from './src'
 
-export default mathieumagalhaes({
+export default antfu(mathieumagalhaes({
   type: 'app',
   vue: true,
   typescript: true,
@@ -20,9 +21,16 @@ export default mathieumagalhaes({
     'pnpm-lock.yaml',
     'tsconfig*.json',
     'vite.config.ts',
-    './*.md',
   ],
 
   srcFolder: resolve(import.meta.dirname, './src'),
-  PreferAtPrefixImportsRules: true,
-})
+  preferAtPrefixImportsRules: true,
+  doNotSetDefaultIgnores: true,
+
+  aliasesTypesRelated: [],
+  aliasesAppRelated: [],
+  aliasesLayoutRelated: [],
+  aliasesComponentsRelated: [],
+  aliasesConstantsRelated: [],
+  aliasesFunctionsRelated: [],
+}))

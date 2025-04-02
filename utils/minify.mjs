@@ -1,6 +1,6 @@
-import { fileURLToPath } from 'url'
-import { dirname, join } from 'path'
-import { readdir, readFileSync, writeFileSync } from 'fs'
+import { readdir, readFileSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { minify } from 'terser'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -25,22 +25,21 @@ readdir(distDir, { recursive: true }, async (err, files) => {
         compress: true,
         mangle: true,
         format: {
-          comments: false
+          comments: false,
         },
         sourceMap: {
           filename: fileName,
-          url: fileName + '.map'
-        }
+          url: `${fileName}.map`,
+        },
       })
 
       writeFileSync(filePath, result.code)
-      writeFileSync(filePath + '.map', result.map)
+      writeFileSync(`${filePath}.map`, result.map)
     }
+    // eslint-disable-next-line no-console
     console.log('Build completed successfully')
   } catch (error) {
     console.error('Build failed:', error)
-    // eslint-disable-next-line n/no-process-exit
     process.exit(1)
   }
 })
-

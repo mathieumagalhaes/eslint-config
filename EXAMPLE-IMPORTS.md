@@ -21,7 +21,6 @@ import type { Details } from './data'
 // 'index-type' - TypeScript type imports from main directory file
 import type { BaseOptions } from './index.d.ts'
 
-
 // 'builtin' - Node.js Built-in Modules
 import path from 'path'
 // 'external' - External modules installed in the project
@@ -37,7 +36,7 @@ import main from '.'
 import styles from './index.module.css'
 
 // 'internal' - Your internal modules
-import Button from '@/components/Button'
+import Button from '@/abc/Button'
 
 // 'object' - TypeScript object-imports
 import log = console.log

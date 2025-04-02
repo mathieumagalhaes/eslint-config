@@ -1,6 +1,8 @@
 import { readdirSync, statSync } from 'node:fs'
 import { resolve } from 'node:path'
 
+import type { ExtendedOptions } from './types'
+
 type Folder = {
   path: string
   folderName: string
@@ -65,8 +67,17 @@ const parseSourceFolder = (srcFolder: string) => {
   return { CUSTOM_GROUPS }
 }
 
-export const sortImportsConfig = (srcFolder: string) => {
+export const sortImportsConfig = (srcFolder: string, options: ExtendedOptions = {}) => {
   const { CUSTOM_GROUPS } = parseSourceFolder(srcFolder)
+
+  const {
+    aliasesAppRelated,
+    aliasesLayoutRelated,
+    aliasesComponentsRelated,
+    aliasesConstantsRelated,
+    aliasesFunctionsRelated,
+    aliasesTypesRelated,
+  } = options
 
   const existsOrUndefined = (folderAlias: string) => {
     return CUSTOM_GROUPS[folderAlias] ? folderAlias : undefined
@@ -85,6 +96,7 @@ export const sortImportsConfig = (srcFolder: string) => {
     '@/store',
     '@/stores',
     '@/constants',
+    '@/enums',
     '@/functions',
     '@/utils',
     '@/lib',
@@ -93,6 +105,8 @@ export const sortImportsConfig = (srcFolder: string) => {
     '@/layouts',
     '@/pages',
     '@/components',
+    '@/main',
+    '@/index',
     //
     '@/vue',
     '@/vueuse',
@@ -112,9 +126,11 @@ export const sortImportsConfig = (srcFolder: string) => {
     ['@/react'],
     [
       'builtin-type',
+      'builtin',
+    ],
+    [
       'external-type',
       'type',
-      'builtin',
       'external',
       'unknown',
     ],
@@ -132,11 +148,17 @@ export const sortImportsConfig = (srcFolder: string) => {
     // --- New line here ---
     [
       'internal-type',
-      'internal',
+      existsOrUndefined('@/types'),
+      ...(aliasesTypesRelated || []).map(existsOrUndefined),
+    ].filter(Boolean),
+    ['internal'],
+    [
       ...unsortedAliasses,
       existsOrUndefined('@/app'),
       existsOrUndefined('@/assets'),
+      existsOrUndefined('@/index'),
       existsOrUndefined('@/public'),
+      existsOrUndefined('@/main'),
       existsOrUndefined('@/middleware'),
       existsOrUndefined('@/modules'),
       existsOrUndefined('@/plugins'),
@@ -144,28 +166,33 @@ export const sortImportsConfig = (srcFolder: string) => {
       existsOrUndefined('@/server'),
       existsOrUndefined('@/store'),
       existsOrUndefined('@/stores'),
-      existsOrUndefined('@/types'),
+      ...(aliasesAppRelated || []).map(existsOrUndefined),
     ].filter(Boolean),
     { newlinesBetween: 'always' },
     // --- New line here ---
     [
       existsOrUndefined('@/layouts'),
       existsOrUndefined('@/pages'),
+      ...(aliasesLayoutRelated || []).map(existsOrUndefined),
     ].filter(Boolean),
     { newlinesBetween: 'always' },
     // --- New line here ---
     [
       existsOrUndefined('@/components'),
       existsOrUndefined('@/templates'),
+      ...(aliasesComponentsRelated || []).map(existsOrUndefined),
     ].filter(Boolean),
     { newlinesBetween: 'always' },
     // --- New line here ---
     [
       existsOrUndefined('@/constants'),
+      existsOrUndefined('@/enums'),
       existsOrUndefined('@/functions'),
       existsOrUndefined('@/hooks'),
       existsOrUndefined('@/lib'),
       existsOrUndefined('@/utils'),
+      ...(aliasesConstantsRelated || []).map(existsOrUndefined),
+      ...(aliasesFunctionsRelated || []).map(existsOrUndefined),
     ].filter(Boolean),
     { newlinesBetween: 'always' },
     // --- New line here ---

@@ -1,17 +1,25 @@
+import { resolve } from 'node:path'
 import type { OptionsConfig, TypedFlatConfigItem } from '@antfu/eslint-config'
 import searchAndReplace from '@mathieumagalhaes/eslint-plugin-search-and-replace'
 import type { Linter } from 'eslint'
-import { resolve } from 'node:path'
 
 import { sortImportsConfig } from './sorting'
+import type { ExtendedOptions } from './types'
 
 const DEFAULT_IGNORES = [
+  '.git/**',
+  '.gitlab/**',
+  '.idea/**',
+  '.vscode/**',
+  '.husky/**',
   'node_modules/**',
   'dist/**',
   'build/**',
   'public/meta/*.json',
   'package.json',
   'package-lock.json',
+  'pnpm-lock.yaml',
+  'yarn.lock',
 ]
 
 const DEFAULT_STYLISITC = {
@@ -20,15 +28,6 @@ const DEFAULT_STYLISITC = {
   semi: false,
   jsx: false,
 }
-
-type MyOptions = {
-  srcFolder?: string
-  preferAtPrefixImportsRules?: boolean
-  addDefaultIgnores?: boolean
-}
-
-type AntfuOptions = OptionsConfig & Omit<TypedFlatConfigItem, 'files'>
-type ExtendedOptions = AntfuOptions & MyOptions
 
 const TypescriptRules = {
   '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
@@ -73,7 +72,7 @@ const customRules = (options: ExtendedOptions = {}) => {
     'node/prefer-global/process': 'off',
     'perfectionist/sort-imports': [
       'error',
-      sortImportsConfig(srcFolder),
+      sortImportsConfig(srcFolder, options),
     ],
     'regexp/no-unused-capturing-group': 'off',
     'style/arrow-parens': ['error', 'as-needed'],
@@ -129,7 +128,7 @@ export default function (optionsDTO: ExtendedOptions): OptionsConfig & Omit<Type
   }
 
   options.ignores = [
-    ...DEFAULT_IGNORES,
+    ...(options.doNotSetDefaultIgnores ? [] : DEFAULT_IGNORES),
     ...(options.ignores || []),
   ]
 
