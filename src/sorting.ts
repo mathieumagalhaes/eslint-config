@@ -112,6 +112,12 @@ export const sortImportsConfig = (srcFolder: string, options: ExtendedOptions = 
     '@/vueuse',
     '@/nuxt',
     '@/react',
+    ...(aliasesAppRelated || []),
+    ...(aliasesLayoutRelated || []),
+    ...(aliasesComponentsRelated || []),
+    ...(aliasesConstantsRelated || []),
+    ...(aliasesFunctionsRelated || []),
+    ...(aliasesTypesRelated || []),
   ]
 
   const unsortedAliasses = Object.keys(CUSTOM_GROUPS).filter(alias => !alreadySorted.includes(alias))
