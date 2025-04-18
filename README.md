@@ -24,28 +24,34 @@ npm install -D @mathieumagalhaes/eslint-config @antfu/eslint-config eslint jiti
 
 ## Minimal setup
 ```js
-// eslint.config.ts or eslint.config.mjs
+// eslint.config.ts
 import { resolve } from 'node:path'
 import antfu from '@antfu/eslint-config'
 import mathieumagalhaes from '@mathieumagalhaes/eslint-config'
 
-export default antfu(mathieumagalhaes({
+type ESLintConfig = ReturnType<typeof antfu>
+
+const config: ESLintConfig = antfu(mathieumagalhaes({
   type: 'app',
   typescript: true,
 
   srcFolder: resolve(import.meta.dirname, './src'), // default: ./src
   preferAtPrefixImportsRules: true, // default: false
 }))
+
+export default config
 ```
 
 ## Full setup:
 ```js
-// eslint.config.ts or eslint.config.mjs
+// eslint.config.ts
 import { resolve } from 'node:path'
 import antfu from '@antfu/eslint-config'
 import mathieumagalhaes from '@mathieumagalhaes/eslint-config'
 
-export default antfu(mathieumagalhaes({
+type ESLintConfig = ReturnType<typeof antfu>
+
+const config: ESLintConfig = antfu(mathieumagalhaes({
   // Check out @antfu/eslint-config for other options!
   type: 'app',
   vue: true,
@@ -73,6 +79,8 @@ export default antfu(mathieumagalhaes({
     'perfectionist/sort-imports': 'off',
   }
 }))
+
+export default config
 ```
 ___
 
