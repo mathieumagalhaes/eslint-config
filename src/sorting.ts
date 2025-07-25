@@ -27,25 +27,37 @@ const ignoreFolders = [
   'node_modules',
 ]
 
-const parseSourceFolder = (srcFolder: string, options: ExtendedOptions = {}) => {
-  const folders = readdirSync(srcFolder)
+const getFolders = (srcFolder: string, subfolder?: string) => {
+  const srcPath = subfolder ? resolve(srcFolder, subfolder) : srcFolder
+  return readdirSync(srcPath)
     .filter(el => !ignoreFolders.includes(el))
     .reduce<Folder[]>((acc, pathToInput) => {
-      const path = resolve(srcFolder, pathToInput)
+      const path = resolve(srcPath, pathToInput)
       if (statSync(path).isDirectory()) {
-        acc.push({
+        const result = {
           path,
           folderName: pathToInput.split('/').slice(-1)[0],
-        })
+        }
+        if (subfolder) result.folderName = `${subfolder}/${result.folderName}`
+        acc.push(result)
       }
       return acc
     }, [])
+}
+
+const parseSourceFolder = (srcFolder: string, options: ExtendedOptions = {}) => {
+  let folders = getFolders(srcFolder)
+
+  if (folders.find(el => el.folderName === 'app')) {
+    folders = folders.concat(getFolders(srcFolder, 'app'))
+  }
 
   const CUSTOM_GROUPS: Record<string, string[]> = {
     '@/react': ['^react$', '^react-.*', '^@react/.*'],
     '@/vue': ['^vue$', '^vue-.*', '^@vue/.*', 'vuex'],
     '@/vueuse': ['^vueuse$', '^vueuse-.*', '^@vueuse/.*'],
     '@/nuxt': ['^nuxt$', '^nuxt-.*', '^@nuxt/.*'],
+    '@/shared': ['^shared$', '^shared/.*', '^@/shared$', '^@/shared/.*'],
   }
 
   folders.forEach(({ folderName }) => {
@@ -65,11 +77,11 @@ const parseSourceFolder = (srcFolder: string, options: ExtendedOptions = {}) => 
   })
 
   const aliasesAppRelated = options?.aliasesAppRelated || []
-  const aliasesLayoutRelated = options?.aliasesAppRelated || []
-  const aliasesComponentsRelated = options?.aliasesAppRelated || []
-  const aliasesConstantsRelated = options?.aliasesAppRelated || []
-  const aliasesFunctionsRelated = options?.aliasesAppRelated || []
-  const aliasesTypesRelated = options?.aliasesAppRelated || []
+  const aliasesLayoutRelated = options?.aliasesLayoutRelated || []
+  const aliasesComponentsRelated = options?.aliasesComponentsRelated || []
+  const aliasesConstantsRelated = options?.aliasesConstantsRelated || []
+  const aliasesFunctionsRelated = options?.aliasesFunctionsRelated || []
+  const aliasesTypesRelated = options?.aliasesTypesRelated || []
 
   const aliasMap = (el: string) => {
     if (!CUSTOM_GROUPS[el]) CUSTOM_GROUPS[el] = [`^${el}$`, `^${el}/+`]
@@ -111,6 +123,29 @@ const parseSourceFolder = (srcFolder: string, options: ExtendedOptions = {}) => 
     '@/vueuse',
     '@/nuxt',
     '@/react',
+    '@/shared',
+    //
+    '@/app/types',
+    '@/app',
+    '@/app/assets',
+    '@/app/public',
+    '@/app/middleware',
+    '@/app/modules',
+    '@/app/plugins',
+    '@/app/providers',
+    '@/app/server',
+    '@/app/store',
+    '@/app/stores',
+    '@/app/pages',
+    '@/app/layouts',
+    '@/app/components',
+    '@/app/templates',
+    '@/app/constants',
+    '@/app/enums',
+    '@/app/functions',
+    '@/app/hooks',
+    '@/app/lib',
+    '@/app/utils',
   ]
 
   const canSafelyAddInternalAlias = (folderAlias: string) => {
@@ -197,16 +232,35 @@ export const sortImportsConfig = (srcFolder: string, options: ExtendedOptions = 
     [
       'internal-type',
       canSafelyAddInternalAlias('@/types'),
+      canSafelyAddInternalAlias('@/app/types'),
+      canSafelyAddInternalAlias('@/server/types'),
+      canSafelyAddInternalAlias('@/shared/types'),
       ...(aliasesTypesRelated || []).map(canSafelyAddPassedAlias),
     ].filter(Boolean),
     ['internal'],
+    { newlinesBetween: 'always' },
+    // --- New line here ---
+    ['@/shared'],
+    { newlinesBetween: 'always' },
+    // --- New line here ---
     [
       ...unsortedAliasses,
       canSafelyAddInternalAlias('@/app'),
-      canSafelyAddInternalAlias('@/assets'),
       canSafelyAddInternalAlias('@/index'),
-      canSafelyAddInternalAlias('@/public'),
       canSafelyAddInternalAlias('@/main'),
+      //
+      canSafelyAddInternalAlias('@/app/assets'),
+      canSafelyAddInternalAlias('@/app/public'),
+      canSafelyAddInternalAlias('@/app/middleware'),
+      canSafelyAddInternalAlias('@/app/modules'),
+      canSafelyAddInternalAlias('@/app/plugins'),
+      canSafelyAddInternalAlias('@/app/providers'),
+      canSafelyAddInternalAlias('@/app/server'),
+      canSafelyAddInternalAlias('@/app/store'),
+      canSafelyAddInternalAlias('@/app/stores'),
+      //
+      canSafelyAddInternalAlias('@/assets'),
+      canSafelyAddInternalAlias('@/public'),
       canSafelyAddInternalAlias('@/middleware'),
       canSafelyAddInternalAlias('@/modules'),
       canSafelyAddInternalAlias('@/plugins'),
@@ -219,6 +273,8 @@ export const sortImportsConfig = (srcFolder: string, options: ExtendedOptions = 
     { newlinesBetween: 'always' },
     // --- New line here ---
     [
+      canSafelyAddInternalAlias('@/app/pages'),
+      canSafelyAddInternalAlias('@/app/layouts'),
       canSafelyAddInternalAlias('@/layouts'),
       canSafelyAddInternalAlias('@/pages'),
       ...(aliasesLayoutRelated || []).map(canSafelyAddPassedAlias),
@@ -226,6 +282,8 @@ export const sortImportsConfig = (srcFolder: string, options: ExtendedOptions = 
     { newlinesBetween: 'always' },
     // --- New line here ---
     [
+      canSafelyAddInternalAlias('@/app/components'),
+      canSafelyAddInternalAlias('@/app/templates'),
       canSafelyAddInternalAlias('@/components'),
       canSafelyAddInternalAlias('@/templates'),
       ...(aliasesComponentsRelated || []).map(canSafelyAddPassedAlias),
@@ -233,6 +291,12 @@ export const sortImportsConfig = (srcFolder: string, options: ExtendedOptions = 
     { newlinesBetween: 'always' },
     // --- New line here ---
     [
+      canSafelyAddInternalAlias('@/app/constants'),
+      canSafelyAddInternalAlias('@/app/enums'),
+      canSafelyAddInternalAlias('@/app/functions'),
+      canSafelyAddInternalAlias('@/app/hooks'),
+      canSafelyAddInternalAlias('@/app/lib'),
+      canSafelyAddInternalAlias('@/app/utils'),
       canSafelyAddInternalAlias('@/constants'),
       canSafelyAddInternalAlias('@/enums'),
       canSafelyAddInternalAlias('@/functions'),
